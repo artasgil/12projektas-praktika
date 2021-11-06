@@ -1,0 +1,172 @@
+<?php
+
+namespace App\Http\Controllers;
+use App\Category;
+use App\Product;
+use Illuminate\Http\Request;
+
+class ProductController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+
+        $products = Product::all();
+        $categories = Category::all();
+        $category_id = $request->category_id;
+        $range = $request->range;
+        $max_id = $request->max;
+
+        $prices_filter = $products;
+        $price_id = $request->price_id;
+
+        $products = Product::sortable()->paginate(10);
+
+
+
+
+        return view('product.index', ['products'=> $products, "categories" => $categories, "category_id" => $category_id, "range" => $range, "prices_filter" => $prices_filter, "price_id" => $price_id]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+
+        $categories = Category::all();
+        return view('product.create', ['categories' => $categories]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+
+        $categories = Category::all();
+        $categories_count = $categories->count();
+
+        $product = new Product;
+
+        $validateVar = $request->validate([
+            'product_title' => 'required|regex:/^[\pL\s]+$/u|unique:products,title|min:6|max:225',
+            'product_excertpt' => 'required|max:600',
+            'product_description' => 'required|max:1500',
+            'product_price' => 'required|numeric|gt:0',
+            'product_logo' => 'image|mimes:jpg,jpeg,png',
+            'product_category' => 'required|numeric|gt:0|lte:'.$categories_count,
+
+        ]);
+
+        $product->title = $request->product_title;
+        $product->excertpt = $request->product_excertpt;
+        $product->description = $request->product_description;
+        $product->price = $request->product_price;
+        $product->category_id = $request->product_category;
+
+        if($request->has('product_logo'))
+        {
+            $imageName = time().'.'.$request->product_logo->extension();
+            $product->image = '/images/'.$imageName;
+            $request->product_logo->move(public_path('images'), $imageName);
+
+         } else {
+
+            $product->image = '/images/noimage.png';
+        }
+
+        $product->save();
+        return redirect()->route("product.index");
+
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Product  $product
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Product $product)
+    {
+        return view('product.show',["product" => $product]);
+
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Product  $product
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Product $product)
+    {
+        $categories = Category::all();
+        return view('product.edit', ['categories' => $categories, 'product'=>$product]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Product  $product
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Product $product)
+    {
+        $categories = Category::all();
+        $categories_count = $categories->count();
+
+
+        $validateVar = $request->validate([
+            'product_title' => 'required|regex:/^[\pL\s]+$/u|min:6|max:225',
+            'product_excertpt' => 'required|max:600',
+            'product_description' => 'required|max:1500',
+            'product_price' => 'required|numeric|gt:0',
+            'product_logo' => 'image|mimes:jpg,jpeg,png',
+            'product_category' => 'required|numeric|gt:0|lte:'.$categories_count,
+
+        ]);
+
+        $product->title = $request->product_title;
+        $product->excertpt = $request->product_excertpt;
+        $product->description = $request->product_description;
+        $product->price = $request->product_price;
+        $product->category_id = $request->product_category;
+
+        if($request->has('product_logo'))
+        {
+            $imageName = time().'.'.$request->product_logo->extension();
+            $product->image = '/images/'.$imageName;
+            $request->product_logo->move(public_path('images'), $imageName);
+
+         } else {
+
+            $product->image = '/images/noimage.png';
+        }
+
+        $product->save();
+        return redirect()->route("product.index");
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Product  $product
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Product $product)
+    {
+        $product->delete();
+        return redirect()->route("product.index");
+    }
+}
