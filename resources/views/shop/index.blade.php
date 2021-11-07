@@ -16,7 +16,7 @@
         @endif
         <div class="form-row">
             <div class="form-group">
-            <a href="{{route('category.create')}}" class="btn btn-success">Add category</a>
+            <a href="{{route('shop.create')}}" class="btn btn-success">Add shop</a>
             </div>
         </div>
 
@@ -25,24 +25,29 @@
                 <th width="80px"> @sortablelink('id','ID') </th>
                 <th> @sortablelink('title','Title') </th>
                 <th width="210px"> @sortablelink('description','Description') </th>
-                <th>@sortablelink('shopTitle.title','Shop id title') </th>
+                <th>@sortablelink('email','Email') </th>
+                <th>@sortablelink('phone','Phone') </th>
+                <th>@sortablelink('country','Country') </th>
                 <th> Action </th>
                 <th> Delete </th>
             </tr>
-            @foreach ($categories as $category)
+            @foreach ($shops as $shop)
                 <tr>
-                    <td>{{ $category->id }} </td>
-                    <td>{{ $category->title }} </td>
-                    <td>{!! $category ->description !!} </td>
-                    <td>{{ $category->shopTitle->title }}</td>
+                    <td>{{ $shop->id }} </td>
+                    <td>{{ $shop->title }} </td>
+                    <td>{!! $shop ->description !!} </td>
+                    <td>{{ $shop->email }}</td>
+                    <td>{{ $shop->phone }}</td>
+                    <td>{{ $shop->country }}</td>
+
 
                     <td>
                         <div class="btn-group-vertical">
-                            <a href="{{ route('category.show', [$category]) }}" class="btn btn-secondary">Show </a>
-                            <a href="{{ route('category.edit', [$category]) }}" class="btn btn-primary">Edit </a>
+                            <a href="{{ route('shop.show', [$shop]) }}" class="btn btn-secondary">Show </a>
+                            <a href="{{ route('shop.edit', [$shop]) }}" class="btn btn-primary">Edit </a>
                         </div>
                         <td>
-                        <form method="post" action={{ route('category.destroy', [$category]) }}>
+                        <form method="post" action={{ route('shop.destroy', [$shop]) }}>
                             @csrf
                             <div class="form-row">
                                 <div class="form-group col">
@@ -52,9 +57,6 @@
                 </tr>
             @endforeach
         </table>
-
-        {{-- {{$book->links()}} --}}
-
-            {!! $categories->appends(Request::except('page'))->render() !!}
+            {!! $shops->appends(Request::except('page'))->render() !!}
         </div>
 @endsection

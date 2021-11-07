@@ -14,7 +14,9 @@ class ShopController extends Controller
      */
     public function index()
     {
-        //
+        $shops = Shop::sortable()->paginate(10);
+
+        return view('shop.index', ['shops'=>$shops]);
     }
 
     /**
@@ -24,7 +26,7 @@ class ShopController extends Controller
      */
     public function create()
     {
-        //
+        return view('shop.create');
     }
 
     /**
@@ -35,7 +37,29 @@ class ShopController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+
+        $shop = new Shop;
+
+        $validateVar = $request->validate([
+            'shop_title' => 'required|regex:/^[\pL\s]+$/u|unique:shops,title|min:6|max:225',
+            'shop_description' => 'required|max:1500',
+            'shop_email' => 'required|email|max:255',
+            // 'shop_phone' => 'required|max:1500',
+            'shop_country' => 'required|max:1500',
+
+
+        ]);
+
+        $shop->title = $request->shop_title;
+        $shop->description = $request->shop_description;
+        $shop->email = $request->shop_email;
+        $shop->phone = $request->shop_code.$request->shop_phone;
+        $shop->country = $request->shop_country;
+
+
+        $shop->save();
+        return redirect()->route("shop.index");
     }
 
     /**

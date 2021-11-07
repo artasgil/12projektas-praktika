@@ -44,7 +44,7 @@ class CategoryController extends Controller
         $shops = Shop::all();
         $shops_count = $shops->count();
 
-        $category = new Category();
+        $category = new Category;
 
         $validateVar = $request->validate([
             'category_title' => 'required|regex:/^[\pL\s]+$/u|unique:products,title|min:6|max:225',

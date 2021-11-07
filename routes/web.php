@@ -44,6 +44,18 @@ Route::prefix('category')->group(function () {
 
 });
 
+Route::prefix('shop')->group(function () {
+
+    Route::get('','ShopController@index')->name('shop.index')->middleware("auth");
+    Route::get('create', 'ShopController@create')->name('shop.create')->middleware("auth");
+    Route::post('store', 'ShopController@store')->name('shop.store')->middleware("auth");
+    Route::get('edit/{shop}', 'ShopController@edit')->name('shop.edit')->middleware("auth");
+    Route::post('update/{shop}', 'ShopController@update')->name('shop.update')->middleware("auth");
+    Route::post('delete/{shop}', 'ShopController@destroy')->name('shop.destroy')->middleware("auth");
+    Route::get('show/{shop}', 'ShopController@show')->name('shop.show')->middleware("auth");
+
+});
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
