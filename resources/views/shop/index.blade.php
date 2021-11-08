@@ -14,6 +14,8 @@
         {{session()->get("sucess_message")}}
         </div>
         @endif
+
+
         <div class="form-row">
             <div class="form-group">
             <a href="{{route('shop.create')}}" class="btn btn-success">Add shop</a>

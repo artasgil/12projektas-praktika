@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Shop;
+use App\Category;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -45,8 +46,8 @@ class ShopController extends Controller
             'shop_title' => 'required|regex:/^[\pL\s]+$/u|unique:shops,title|min:6|max:225',
             'shop_description' => 'required|max:1500',
             'shop_email' => 'required|email|max:255',
-            // 'shop_phone' => 'required|max:1500',
-            'shop_country' => 'required|max:1500',
+            'shop_phone' => 'required|numeric|max:15',
+            'shop_country' => 'required|max:225',
 
 
         ]);
@@ -70,7 +71,7 @@ class ShopController extends Controller
      */
     public function show(Shop $shop)
     {
-        //
+        return view('shop.show', ['shop'=>$shop]);
     }
 
     /**
@@ -81,7 +82,7 @@ class ShopController extends Controller
      */
     public function edit(Shop $shop)
     {
-        //
+        return view('shop.edit', ['shop'=>$shop]);
     }
 
     /**
@@ -93,7 +94,24 @@ class ShopController extends Controller
      */
     public function update(Request $request, Shop $shop)
     {
-        //
+        $validateVar = $request->validate([
+            'shop_title' => 'required|regex:/^[\pL\s]+$/u|min:6|max:225',
+            'shop_description' => 'required|max:1500',
+            'shop_email' => 'required|email|max:255',
+            'shop_phone' => 'required|max:15',
+            'shop_country' => 'required|max:225',
+
+        ]);
+
+        $shop->title = $request->shop_title;
+        $shop->description = $request->shop_description;
+        $shop->email = $request->shop_email;
+        $shop->phone = $request->shop_phone;
+        $shop->country = $request->shop_country;
+
+
+        $shop->save();
+        return redirect()->route("shop.index");
     }
 
     /**
@@ -104,6 +122,11 @@ class ShopController extends Controller
      */
     public function destroy(Shop $shop)
     {
-        //
+        $category_count = $shop->manyCategories->count();
+        if($category_count!==0) {
+            return redirect()->route("shop.index")->with('error_message','Shop can not be deleted, because has categories');
+        }
+        $shop->delete();
+        return redirect()->route("shop.index")->with('sucess_message','Shop deleted successfully');
     }
 }
