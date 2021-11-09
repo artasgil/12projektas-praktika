@@ -74,10 +74,11 @@
             <div class="form-group">
                 <label for="price_range">{{ __('Price range now: ') }}</label>
                 <input style="border: none; background: none; box-shadow: none; "  type="text" id="amountslider" readonly>
+            </div>
+            <div class="form-group">
                 <label for="price_range">{{ __('Change price range: ') }}</label>
-
-                      <input  type="text" id="amount" name="amountmin" >
-                      <input  type="text" id="amount2" name="amountmax" >
+                <input  type="text" maxlength="5" id="amount" name="amountmin" > -
+                <input  type="text" id="amount2" name="amountmax" >
              </div>
 
             <div class="form-group">
@@ -88,10 +89,16 @@
 
             <div class="form-group">
          <button type="submit" class="btn btn-info">Filter</button>
+        </form>
+
          <a  href="{{ route('product.index') }}" name="clear" class="btn btn-info">Clear filter </a>
 
+         <form method="get" action="{{route('products.pdf')}}">
+            <input style="display:none" name="sort" value='{{$sort}}'  />
+            <input style="display:none" name="direction" value='{{ $direction }}' />
+            <button class="btn btn-dark">Export products table to pdf </button>
+         </form>
             </div>
-        </form>
 
         <table class="table table-striped">
             <tr>

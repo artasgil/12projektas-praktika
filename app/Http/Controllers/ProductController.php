@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Category;
 use App\Product;
+use PDF;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -24,6 +25,10 @@ class ProductController extends Controller
         $maxValue = Product::max('price');
         $refreshmin = $amountmin;
         $refreshmax = $amountmax;
+
+        //Request pdf failui
+        $sort = $request->sort;
+        $direction = $request->direction;
 
         if(!$amountmin && !$amountmax){
             $amountmin = 0;
@@ -49,7 +54,7 @@ class ProductController extends Controller
 
 
         return view('product.index', ['products'=> $products, "categories" => $categories, "category_id" => $category_id, "amountmin" => $amountmin,
-                     "amountmax"=>$amountmax, 'refreshmin' =>$refreshmin, 'refreshmax' => $refreshmax]);
+                     "amountmax"=>$amountmax, 'refreshmin' =>$refreshmin, 'refreshmax' => $refreshmax, 'sort'=>$sort, 'direction'=>$direction]);
     }
 
     /**
@@ -189,4 +194,55 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route("product.index");
     }
+
+    public function generatePDF(Request $request)
+    {
+        $sortby=$request->sort;
+        $collumnName = $request->direction;
+
+        $amountmin = $request->amountmin;
+        $amountmax = $request->amountmax;
+        $minValue = Product::min('price');
+        $maxValue = Product::max('price');
+        $refreshmin = $amountmin;
+        $refreshmax = $amountmax;
+        $category_id = $request->category_id;
+
+
+        if(empty($collumnName) && empty($sortby)) {
+            $sortby = 'id';
+            $collumnName = 'asc';
+        }
+
+        // if(!$amountmin && !$amountmax){
+        //     $amountmin = 0;
+        //     $refreshmin = $amountmin;
+        //     $amountmax = $maxValue;
+        //     $refreshmax = $amountmax;
+        // }
+
+        // $products = Product::orderBy($sortby, $collumnName)->get();
+
+        if(!$category_id){
+            $category_id='all';
+        }
+
+        if($category_id!='all' && $amountmin==$refreshmin && $amountmax==$refreshmax)  //PAGALVOTI KAS NEGERAI
+        {
+            $products = Product::orderBy($sortby, $collumnName)->where('category_id', $category_id)->whereBetween('price', [$amountmin, $amountmax])->get();
+        } else
+        {
+            $products = Product::orderBy($sortby, $collumnName)->whereBetween('price', [$amountmin, $amountmax])->get();
+        }
+
+
+        // $products = Product::all();
+
+        view()->share('products', $products);
+        $pdf = PDF::loadView("pdf_template", $products);
+
+        return $pdf->download("products.pdf");
+
+    }
+
 }
