@@ -32,15 +32,18 @@ class ProductController extends Controller
             $refreshmax = $amountmax;
         }
 
-
         $products = Product::sortable()->paginate(10);
 
+        if(!$category_id){
+            $category_id='all';
+        }
 
-
-
-        if($category_id!='all' && $amountmin && $amountmax)
+        if($category_id!='all' && $amountmin==$refreshmin && $amountmax==$refreshmax)  //PAGALVOTI KAS NEGERAI
         {
             $products = Product::sortable()->where('category_id', $category_id)->whereBetween('price', [$amountmin, $amountmax])->paginate(10);
+        } else
+        {
+            $products = Product::sortable()->whereBetween('price', [$amountmin, $amountmax])->paginate(10);
         }
 
 

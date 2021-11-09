@@ -73,9 +73,11 @@
 
             <div class="form-group">
                 <label for="price_range">{{ __('Price range now: ') }}</label>
-                      <input  type="text" id="amount" name="amountmin" hidden>
-                      <input  type="text" id="amount2" name="amountmax" hidden>
-                      <input style="border: none; background: none; box-shadow: none; "  type="text" id="amountslider" readonly>
+                <input style="border: none; background: none; box-shadow: none; "  type="text" id="amountslider" readonly>
+                <label for="price_range">{{ __('Change price range: ') }}</label>
+
+                      <input  type="text" id="amount" name="amountmin" >
+                      <input  type="text" id="amount2" name="amountmax" >
              </div>
 
             <div class="form-group">
@@ -86,6 +88,8 @@
 
             <div class="form-group">
          <button type="submit" class="btn btn-info">Filter</button>
+         <a  href="{{ route('product.index') }}" name="clear" class="btn btn-info">Clear filter </a>
+
             </div>
         </form>
 
