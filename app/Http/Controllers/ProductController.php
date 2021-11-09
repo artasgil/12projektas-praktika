@@ -18,18 +18,35 @@ class ProductController extends Controller
         $products = Product::all();
         $categories = Category::all();
         $category_id = $request->category_id;
-        $range = $request->range;
-        $max_id = $request->max;
+        $amountmin = $request->amountmin;
+        $amountmax = $request->amountmax;
+        $minValue = Product::min('price');
+        $maxValue = Product::max('price');
+        $refreshmin = $amountmin;
+        $refreshmax = $amountmax;
 
-        $prices_filter = $products;
-        $price_id = $request->price_id;
+        if(!$amountmin && !$amountmax){
+            $amountmin = 0;
+            $refreshmin = $amountmin;
+            $amountmax = $maxValue;
+            $refreshmax = $amountmax;
+        }
+
 
         $products = Product::sortable()->paginate(10);
 
 
 
 
-        return view('product.index', ['products'=> $products, "categories" => $categories, "category_id" => $category_id, "range" => $range, "prices_filter" => $prices_filter, "price_id" => $price_id]);
+        if($category_id!='all' && $amountmin && $amountmax)
+        {
+            $products = Product::sortable()->where('category_id', $category_id)->whereBetween('price', [$amountmin, $amountmax])->paginate(10);
+        }
+
+
+
+        return view('product.index', ['products'=> $products, "categories" => $categories, "category_id" => $category_id, "amountmin" => $amountmin,
+                     "amountmax"=>$amountmax, 'refreshmin' =>$refreshmin, 'refreshmax' => $refreshmax]);
     }
 
     /**
@@ -131,7 +148,7 @@ class ProductController extends Controller
             'product_title' => 'required|regex:/^[\pL\s]+$/u|min:6|max:225',
             'product_excertpt' => 'required|max:600',
             'product_description' => 'required|max:1500',
-            'product_price' => 'required|numeric|gt:0',
+            'product_price' => 'required|gt:0',
             'product_logo' => 'image|mimes:jpg,jpeg,png',
             'product_category' => 'required|numeric|gt:0|lte:'.$categories_count,
 

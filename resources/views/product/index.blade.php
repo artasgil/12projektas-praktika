@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<style>
+{{-- <style>
 .price-range-slider {
   width: 100%;
   float: left;
@@ -41,12 +41,16 @@
 .price-range-slider .range-bar .ui-slider-handle + span {
   background: #06b9c0;
 }
-</style>
+</style> --}}
 
 @section('content')
 
 
     <div class="container">
+        {{$refreshmin}}
+
+        {{$refreshmax}}
+
         <div class="form-row">
             <div class="form-group">
             <a href="{{route('product.create')}}" class="btn btn-success">Add product</a>
@@ -65,17 +69,26 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="price-range-slider">
-                    <p class="range-value">
-                      <input type="text" id="amount" readonly>
-                    </p>
-                    <div id="slider-range" class="range-bar"></div>
-                  </div>
-
-                    <div class="form-group col-md-2">
-                    <button type="submit" class="btn btn-info">Filter</button>
-                    </div>
             </div>
+
+            <div class="form-group">
+                <label for="price_range">{{ __('Price range now: ') }}</label>
+                      <input  type="text" id="amount" name="amountmin" hidden>
+                      <input  type="text" id="amount2" name="amountmax" hidden>
+                      <input style="border: none; background: none; box-shadow: none; "  type="text" id="amountslider" readonly>
+             </div>
+
+            <div class="form-group">
+            <div id="slider-range" type="range" class="form-control-range col-4" >
+            </div>
+            </div>
+
+
+            <div class="form-group">
+         <button type="submit" class="btn btn-info">Filter</button>
+            </div>
+        </form>
+
         <table class="table table-striped">
             <tr>
                 <th width="80px"> @sortablelink('id','ID') </th>
@@ -121,20 +134,54 @@
             {!! $products->appends(Request::except('page'))->render() !!}
         </div>
         <script>
-            $(function() {
-        $( "#slider-range" ).slider({
-        range: true,
-        min: 130,
-        max: 500,
-        values: [ 130, 250 ],
-        slide: function( event, ui ) {
-        $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
-        }
-        });
-        $( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
-        " - $" + $( "#slider-range" ).slider( "values", 1 ) );
-        });
-        </script>
+'use strict'
+    // var integerParts = parseInt({{$refreshmax}});
+    // var decimalPart = {{$refreshmax}} - integerParts;
+
+    // var vienas = {{$refreshmax}}
+
+    var number = {{$refreshmax}},
+    decimalAsInt = Math.round((number - parseInt(number)) * 100);
+    var number2 = decimalAsInt ;
+
+    // var fixedmax = Math.round( vienas * 100) / 100).toFixed(2)
+
+    if (decimalAsInt > 0) {
+    var prideti = {{$refreshmax}} +1;
+    } else {
+        var prideti = {{$refreshmax}};
+    }
+
+$(function () {
+  $("#slider-range").slider({
+    range: true,
+    min: {{$refreshmin}},
+    max: prideti,
+    values: [0 , {{$refreshmax}}],
+    slide: function (event, ui) {
+      $("#amountslider").val("$" + ui.values[0] + " - $" + ui.values[1]);
+
+      $("#amount").val(ui.values[0]);
+      $("#amount2").val(ui.values[1]);
+    }
+  });
+  $("#amount").val(
+      +
+      $("#slider-range").slider("values", 0)
+  );
+  $("#amount2").val(
+      +
+  $("#slider-range").slider("values", 1)
+  );
+
+  $("#amountslider").val(
+    "$" +
+      $("#slider-range").slider("values", 0) +
+      " - $" +
+      $("#slider-range").slider("values", 1)
+  );
+});
+    </script>
 
 
 @endsection
