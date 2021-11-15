@@ -54,7 +54,7 @@ class ProductController extends Controller
 
 
         return view('product.index', ['products'=> $products, "categories" => $categories, "category_id" => $category_id, "amountmin" => $amountmin,
-                     "amountmax"=>$amountmax, 'refreshmin' =>$refreshmin, 'refreshmax' => $refreshmax, 'sort'=>$sort, 'direction'=>$direction]);
+                     "amountmax"=>$amountmax, 'refreshmin' =>$refreshmin, 'refreshmax' => $refreshmax, 'sort'=>$sort, 'direction'=>$direction, 'maxValue' =>$maxValue, 'minValue'=>$minValue]);
     }
 
     /**
@@ -200,54 +200,52 @@ class ProductController extends Controller
 
         $products = Product::all();
 
-        // $sortby=$request->sort;
-        // $collumnName = $request->direction;
+        $sortby=$request->sort;
+        $collumnName = $request->direction;
 
-        // $amountmin = $request->amountmin;
-        // $amountmax = $request->amountmax;
+        $amountmin = $request->amountmin;
+        $amountmax = $request->amountmax;
+        $maxValue = Product::max('price');
+        $refreshmin = $amountmin;
+        $refreshmax = $amountmax;
 
-
-        // $minValue = Product::min('price');
-        // $maxValue = Product::max('price');
-        // $refreshmin = $amountmin;
-        // $refreshmax = $amountmax;
-
-        // $category_id = $request->category_id;
+        $category_id = $request->category_id;
 
 
-        // if(empty($collumnName) && empty($sortby)) {
-        //     $sortby = 'id';
-        //     $collumnName = 'asc';
-        // }
+        if(empty($collumnName) && empty($sortby)) {
+            $sortby = 'id';
+            $collumnName = 'asc';
+        }
 
-        // if(!$amountmin && !$amountmax){
-        //     $amountmin = 0;
-        //     $refreshmin = $amountmin;
-        //     $amountmax = $maxValue;
-        //     $refreshmax = $amountmax;
-        // }
-        // if(!$category_id){
-        //     $category_id='all';
-        // }
+        if(!$amountmin && !$amountmax){
+            $amountmin = 0;
+            $refreshmin = $amountmin;
+            $amountmax = $maxValue;
+            $refreshmax = $amountmax;
+        }
+
+        if(!$category_id){
+            $category_id='all';
+        }
 
         // $products = Product::orderBy($sortby, $collumnName)->get();
 
-    // if($category_id) {
-    //     if($category_id == "all") {
-    //         $products = Product::orderBy($sortby, $collumnName)->get();
-    //     }
-    //     else {
-    //         $products = Product::orderBy($sortby, $collumnName)->where("category_id", $category_id)->get();
-    //     }
-    // }
+    if($category_id) {
+        if($category_id == "all") {
+            $products = Product::orderBy($sortby, $collumnName)->get();
+        }
+        else {
+            $products = Product::orderBy($sortby, $collumnName)->where("category_id", $category_id)->get();
+        }
+    }
 
-        // if($category_id!='all' && $amountmin && $amountmax)  //PAGALVOTI KAS NEGERAI
-        // {
-        //     $products = Product::orderBy($sortby, $collumnName)->where('category_id', $category_id)->whereBetween('price', [$amountmin, $amountmax])->get();
-        // } else
-        // {
-        //     $products = Product::orderBy($sortby, $collumnName)->whereBetween('price', [$amountmin, $amountmax])->get();
-        // }
+        if($category_id!='all' && $amountmin && $amountmax)  //PAGALVOTI KAS NEGERAI
+        {
+            $products = Product::orderBy($sortby, $collumnName)->where('category_id', $category_id)->whereBetween('price', [$amountmin, $amountmax])->get();
+        } else
+        {
+            $products = Product::orderBy($sortby, $collumnName)->whereBetween('price', [$amountmin, $amountmax])->get();
+        }
 
 
         // $products = Product::orderBy($sortby, $collumnName)->whereBetween('price', [$amountmin, $amountmax])->get();

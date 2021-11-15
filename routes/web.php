@@ -40,6 +40,7 @@ Route::prefix('category')->group(function () {
     Route::post('update/{category}', 'CategoryController@update')->name('category.update')->middleware("auth");
     Route::post('delete/{category}', 'CategoryController@destroy')->name('category.destroy')->middleware("auth");
     Route::get('show/{category}', 'CategoryController@show')->name('category.show')->middleware("auth");
+    Route::post('indexstore', 'CategoryController@indexstore')->name('category.indexstore')->middleware("auth");
 
 });
 

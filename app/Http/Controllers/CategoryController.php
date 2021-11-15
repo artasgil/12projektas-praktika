@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Shop;
+use Validator;
 
 use Illuminate\Http\Request;
 
@@ -16,10 +17,11 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $shops = Shop::all();
 
         $categories = Category::sortable()->paginate(10);
 
-        return view('category.index', ['categories'=> $categories]);
+        return view('category.index', ['categories'=> $categories, 'shops'=>$shops]);
     }
 
     /**
@@ -127,4 +129,47 @@ class CategoryController extends Controller
         $category->delete();
         return redirect()->route("category.index")->with('sucess_message','Category deleted successfully');
     }
+
+    public function indexstore(Request $request)
+    {
+        $shops = Shop::all();
+        $shops_count = $shops->count();
+
+        $input = [
+            'category_title' => $request->category_title,
+            'category_description' => $request->category_description,
+        ];
+
+        $rules = [
+            'category_title' => 'required|regex:/^[\pL\s]+$/u|unique:products,title|min:6|max:225',
+            'category_description' => 'required|max:1500',
+            'category_shop' => 'numeric|gt:0|lte:'.$shops_count
+        ];
+
+        $validator = Validator::make($input, $rules);
+
+        if($validator->passes()) {
+            $category = new Category;
+            $category->title = $request->category_title;
+            $category->description = $request->category_description;
+            $category->shop_id = $request->category_shop;
+
+            $category->save();
+
+            $success= ['success' => 'category added successfully'];
+            $success_json = response()->json($success);
+            return $success_json;
+
+        }
+
+        $error = [
+            'error' => $validator->messages()->get("*")
+        ];
+
+        $error_json = response()->json($error);
+
+        return $error_json;
+
+    }
 }
+

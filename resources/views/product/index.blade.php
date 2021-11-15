@@ -57,6 +57,108 @@
             </div>
         </div>
 
+        <div class="form-row">
+            <div class="form-group">
+                <button class= "btn btn-primary" type = "submit" id="addfirst">Add Product AJAX</button>
+            </div>
+        </div>
+
+        <div class="ajaxForm " >
+
+            <div class="form-group row">
+                <label for="book_title"
+                    class="col-md-4 col-form-label text-md-right">{{ __('Product title') }}</label>
+
+                <div class="col-md-6">
+                    <input id="product_title" type="text" class="form-control @error('product_title') is-invalid @enderror" name="product_title" autofocus>
+                        @error('product_title')
+                        <span role="alert" class="invalid-feedback">
+                            <strong>*{{$message}}</strong>
+                        </span>
+                        @enderror
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="product_excertpt"
+                    class="col-md-4 col-form-label text-md-right">{{ __('Product excertpt') }}</label>
+
+                <div class="col-md-6">
+                    <textarea class="summernote @error('product_excertpt') is-invalid @enderror" cols="38" rows="5" name="product_excertpt"> </textarea>
+                        @error('product_excertpt')
+                        <span role="alert" class="invalid-feedback">
+                            <strong>*{{$message}}</strong>
+                        </span>
+                        @enderror
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="product_description"
+                    class="col-md-4 col-form-label text-md-right">{{ __('Product description') }}</label>
+
+                <div class="col-md-6">
+                    <textarea class="summernote @error('product_description') is-invalid @enderror" cols="38" rows="5" name="product_description"> </textarea>
+                        @error('product_description')
+                        <span role="alert" class="invalid-feedback">
+                            <strong>*{{$message}}</strong>
+                        </span>
+                        @enderror
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="product_price"
+                    class="col-md-4 col-form-label text-md-right">{{ __('Product Price') }}</label>
+
+                <div class="col-md-2">
+                    <div class="input-group">
+                    <input id="book_isbn" type="integer" class="form-control @error('product_price') is-invalid @enderror" name="product_price" autofocus>
+                        <span class="input-group-text">$</span>
+                      </div>
+                        @error('product_price')
+                        <span role="alert" class="invalid-feedback">
+                            <strong>*{{$message}}</strong>
+                        </span>
+                        @enderror
+                </div>
+            </div>
+            <div class="form-group row">
+
+                <label for="product_logo"
+                    class="col-md-4 col-form-label text-md-right">{{ __('Product logo') }}</label>
+                <div class="col-md-6">
+                    <input id="imageurl" type="file" class="form-control @error('product_logo') is-invalid @enderror" name="product_logo">
+                    @error('product_logo')
+                    <span role="alert" class="invalid-feedback">
+                        <strong>*{{$message}}</strong>
+                    </span>
+                    @enderror
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="product_category"
+                    class="col-md-4 col-form-label text-md-right">{{ __('Product Category') }}</label>
+                <div class="col-md-6">
+                    <select class="form-control @error('product_category') is-invalid @enderror" name="product_category">
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->title }}</option>
+                        @endforeach
+                    </select>
+                    @error('product_category')
+                    <span role="alert" class="invalid-feedback">
+                        <strong>*{{$message}}</strong>
+                    </span>
+                    @enderror
+                </div>
+            </div>
+            <div class="form-group row mb-0">
+                <div class="col-md-6 offset-md-4">
+                    <button type="submit" class="btn btn-primary">
+                        {{ __('Create') }}
+                    </button>
+                </div>
+            </div>
+
+
+
         <form action="{{ route('product.index') }}" method="GET">
             @csrf
             <div class="form-row">
@@ -70,6 +172,7 @@
                     </select>
                 </div>
             </div>
+        </div>
 
             <div class="form-group">
                 <label for="price_range">{{ __('Price range now: ') }}</label>
@@ -96,6 +199,10 @@
          <form method="get" action="{{route('products.pdf')}}">
             <input style="display:none" name="sort" value='{{$sort}}'  />
             <input style="display:none" name="direction" value='{{ $direction }}' />
+            <input style="display:none" name="category_id" value='{{ $category_id }}' />
+            <input style="display:none" name="amountmin" value='{{ $amountmin }}' />
+            <input style="display:none" name="amountmax" value='{{ $amountmax }}' />
+
             <button class="btn btn-dark">Export products table to pdf </button>
          </form>
             </div>
@@ -144,31 +251,40 @@
 
             {!! $products->appends(Request::except('page'))->render() !!}
         </div>
+        {{--  1.07 EINA NUO VIENETO--}}
+        {{--  2.98 eina nuo 2--}}
+        {{$minValue}}
         <script>
 'use strict'
     // var integerParts = parseInt({{$refreshmax}});
     // var decimalPart = {{$refreshmax}} - integerParts;
 
     // var vienas = {{$refreshmax}}
+            var minValue = {{$minValue}};
+            minValue = Math.floor(minValue);
 
-    var number = {{$refreshmax}},
-    decimalAsInt = Math.round((number - parseInt(number)) * 100);
-    var number2 = decimalAsInt ;
+            var maxValue = {{$maxValue}};
+            maxValue = Math.ceil(maxValue);
+
+    // var number = {{$refreshmax}},
+    // // decimalAsInt = Math.round((number - parseInt(number)) * 100);
+    // decimalAsInt = Math.ceil(number);
+    // var number2 = decimalAsInt ;
 
     // var fixedmax = Math.round( vienas * 100) / 100).toFixed(2)
 
-    if (decimalAsInt > 0) {
-    var prideti = {{$refreshmax}} +1;
-    } else {
-        var prideti = {{$refreshmax}};
-    }
+    // if (decimalAsInt > 0) {
+    // var prideti = {{$refreshmax}} +1;
+    // } else {
+    //     var prideti = {{$refreshmax}};
+    // }
 
 $(function () {
   $("#slider-range").slider({
     range: true,
-    min: {{$refreshmin}},
-    max: prideti,
-    values: [0 , {{$refreshmax}}],
+    min: minValue,
+    max: maxValue,
+    values: [{{$refreshmin}} , {{$refreshmax}}],
     slide: function (event, ui) {
       $("#amountslider").val("$" + ui.values[0] + " - $" + ui.values[1]);
 
