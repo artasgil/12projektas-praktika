@@ -156,7 +156,7 @@ class CategoryController extends Controller
 
             $category->save();
 
-            $success= ['success' => 'category added successfully'];
+            $success= ['success' => 'Category added successfully'];
             $success_json = response()->json($success);
             return $success_json;
 

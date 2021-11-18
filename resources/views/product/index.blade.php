@@ -47,9 +47,6 @@
 
 
     <div class="container">
-        {{$refreshmin}}
-
-        {{$refreshmax}}
 
         <div class="form-row">
             <div class="form-group">
@@ -63,45 +60,39 @@
             </div>
         </div>
 
-        <div class="ajaxForm " >
+        <div class="ajaxForm d-none" >
 
             <div class="form-group row">
                 <label for="book_title"
                     class="col-md-4 col-form-label text-md-right">{{ __('Product title') }}</label>
 
-                <div class="col-md-6">
-                    <input id="product_title" type="text" class="form-control @error('product_title') is-invalid @enderror" name="product_title" autofocus>
-                        @error('product_title')
-                        <span role="alert" class="invalid-feedback">
-                            <strong>*{{$message}}</strong>
+                <div class="col-md-4">
+                    <input id="product_title" type="text" class="form-control" name="product_title" autofocus>
+                    <span class="invalid-feedback product_title" role="alert">
+                        <strong></strong>
                         </span>
-                        @enderror
                 </div>
             </div>
             <div class="form-group row">
                 <label for="product_excertpt"
                     class="col-md-4 col-form-label text-md-right">{{ __('Product excertpt') }}</label>
 
-                <div class="col-md-6">
-                    <textarea class="summernote @error('product_excertpt') is-invalid @enderror" cols="38" rows="5" name="product_excertpt"> </textarea>
-                        @error('product_excertpt')
-                        <span role="alert" class="invalid-feedback">
-                            <strong>*{{$message}}</strong>
+                <div class="col-md-4">
+                    <textarea class="summernote form-control" name="product_excertpt" id="product_excertpt"> </textarea>
+                    <span class="invalid-feedback product_excertpt" role="alert">
+                        <strong></strong>
                         </span>
-                        @enderror
                 </div>
             </div>
             <div class="form-group row">
                 <label for="product_description"
                     class="col-md-4 col-form-label text-md-right">{{ __('Product description') }}</label>
 
-                <div class="col-md-6">
-                    <textarea class="summernote @error('product_description') is-invalid @enderror" cols="38" rows="5" name="product_description"> </textarea>
-                        @error('product_description')
-                        <span role="alert" class="invalid-feedback">
-                            <strong>*{{$message}}</strong>
+                <div class="col-md-4">
+                    <textarea class="summernote form-control" name="product_description" id="product_description"> </textarea>
+                    <span class="invalid-feedback product_excertpt" role="alert">
+                        <strong></strong>
                         </span>
-                        @enderror
                 </div>
             </div>
             <div class="form-group row">
@@ -110,55 +101,50 @@
 
                 <div class="col-md-2">
                     <div class="input-group">
-                    <input id="book_isbn" type="integer" class="form-control @error('product_price') is-invalid @enderror" name="product_price" autofocus>
+                    <input id="product_price" type="integer" class="form-control" name="product_price" autofocus>
                         <span class="input-group-text">$</span>
                       </div>
-                        @error('product_price')
-                        <span role="alert" class="invalid-feedback">
-                            <strong>*{{$message}}</strong>
+                      <span class="invalid-feedback product_price" role="alert">
+                        <strong></strong>
                         </span>
-                        @enderror
                 </div>
             </div>
             <div class="form-group row">
 
                 <label for="product_logo"
                     class="col-md-4 col-form-label text-md-right">{{ __('Product logo') }}</label>
-                <div class="col-md-6">
-                    <input id="imageurl" type="file" class="form-control @error('product_logo') is-invalid @enderror" name="product_logo">
-                    @error('product_logo')
-                    <span role="alert" class="invalid-feedback">
-                        <strong>*{{$message}}</strong>
-                    </span>
-                    @enderror
+                <div class="col-md-4">
+                    <input id="product_logo" type="file" class="form-control" name="product_logo" enctype="multipart/form-data">
+                    <span class="invalid-feedback product_logo" role="alert">
+                        <strong></strong>
+                        </span>
                 </div>
             </div>
             <div class="form-group row">
                 <label for="product_category"
                     class="col-md-4 col-form-label text-md-right">{{ __('Product Category') }}</label>
-                <div class="col-md-6">
-                    <select class="form-control @error('product_category') is-invalid @enderror" name="product_category">
+                <div class="col-md-4">
+                    <select class="form-control" name="product_category" id="product_category">
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->title }}</option>
                         @endforeach
                     </select>
-                    @error('product_category')
-                    <span role="alert" class="invalid-feedback">
-                        <strong>*{{$message}}</strong>
-                    </span>
-                    @enderror
+                    <span class="invalid-feedback product_category" role="alert">
+                        <strong></strong>
+                        </span>
                 </div>
             </div>
             <div class="form-group row mb-0">
                 <div class="col-md-6 offset-md-4">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="add">
                         {{ __('Create') }}
                     </button>
                 </div>
             </div>
 
 
-
+            <div class="form-group row">
+            </div>
         <form action="{{ route('product.index') }}" method="GET">
             @csrf
             <div class="form-row">
@@ -309,6 +295,58 @@ $(function () {
   );
 });
     </script>
+
+<script>
+    $.ajaxSetup({
+headers: {
+    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+}
+});
+
+$("#addfirst").click(function() {
+$(".ajaxForm").toggleClass("d-none");
+});
+$("#add").click(function() {
+var product_title = $("#product_title").val();
+var product_excertpt = $("#product_excertpt").val();
+var product_description = $("#product_description").val();
+var product_price = $("#product_price").val();
+var product_category = $("#product_category").val();
+var product_logo = $("#product_logo").val();
+// var product_logo = document.getElementById("#product_logo");
+
+
+
+$.ajax({
+    type: 'POST',
+    url: '{{route("product.indexstore")}}',
+    data: {product_title: product_title,  product_excertpt: product_excertpt, product_description: product_description, product_price: product_price, product_category: product_category, product_logo: product_logo},
+    success: function(data) {
+
+        if($.isEmptyObject(data.error)) {
+            $(".error-messages").css('display','none');
+            $(".invalid-feedback").css('display','none');
+            $(".ajaxForm").toggleClass("d-none");
+            alert(data.success);
+        } else {
+
+            $(".error-messages ul").html('');
+            $(".error-messages").css('display','block');
+
+            $(".invalid-feedback").css('display','none');
+            $.each( data.error, function(key, error) {
+                var errorSpan = "." + key;
+                $(errorSpan).css('display', 'block');
+                $(errorSpan).html('');
+                $(errorSpan).append("<strong>"+error+"</strong");
+                $(".error-messages ul").append("<li>"+ error + "</li>");
+            })
+        }
+    }
+});
+});
+
+</script>
 
 
 @endsection

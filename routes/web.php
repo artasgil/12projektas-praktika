@@ -28,6 +28,8 @@ Route::prefix('product')->group(function () {
     Route::post('delete/{product}', 'ProductController@destroy')->name('product.destroy')->middleware("auth");
     Route::get('show/{product}', 'ProductController@show')->name('product.show')->middleware("auth");
     Route::get('/pdf','ProductController@generatePDF')->name('products.pdf')->middleware("auth");
+    Route::post('indexstore', 'ProductController@indexstore')->name('product.indexstore')->middleware("auth");
+
 
 });
 
@@ -53,6 +55,8 @@ Route::prefix('shop')->group(function () {
     Route::post('update/{shop}', 'ShopController@update')->name('shop.update')->middleware("auth");
     Route::post('delete/{shop}', 'ShopController@destroy')->name('shop.destroy')->middleware("auth");
     Route::get('show/{shop}', 'ShopController@show')->name('shop.show')->middleware("auth");
+    Route::post('indexstore', 'ShopController@indexstore')->name('shop.indexstore')->middleware("auth");
+
 
 });
 

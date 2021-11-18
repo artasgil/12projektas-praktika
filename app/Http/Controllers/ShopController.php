@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Shop;
 use App\Category;
+use Validator;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -46,7 +47,7 @@ class ShopController extends Controller
             'shop_title' => 'required|regex:/^[\pL\s]+$/u|unique:shops,title|min:6|max:225',
             'shop_description' => 'required|max:1500',
             'shop_email' => 'required|email|max:255',
-            'shop_phone' => 'required|numeric|max:15',
+            'shop_phone' => 'required|numeric|integer',
             'shop_country' => 'required|max:225',
 
 
@@ -98,7 +99,7 @@ class ShopController extends Controller
             'shop_title' => 'required|regex:/^[\pL\s]+$/u|min:6|max:225',
             'shop_description' => 'required|max:1500',
             'shop_email' => 'required|email|max:255',
-            'shop_phone' => 'required|max:15',
+            'shop_phone' => 'required|numeric|integer',
             'shop_country' => 'required|max:225',
 
         ]);
@@ -129,4 +130,54 @@ class ShopController extends Controller
         $shop->delete();
         return redirect()->route("shop.index")->with('sucess_message','Shop deleted successfully');
     }
+    public function indexstore(Request $request)
+    {
+
+
+        $shop = new Shop;
+
+        $input = [
+            'shop_title' => $request->shop_title,
+            'shop_description' => $request->shop_description,
+            'shop_email' => $request->shop_email,
+            'shop_phone' => $request->shop_phone,
+            'shop_country' => $request->shop_country,
+        ];
+
+        $rules = [
+            'shop_title' => 'required|regex:/^[\pL\s]+$/u|unique:shops,title|min:6|max:225',
+            'shop_description' => 'required|max:1500',
+            'shop_email' => 'required|email|max:255',
+            'shop_phone' => 'required|numeric',
+            'shop_country' => 'required|max:225',
+        ];
+
+        $validator = Validator::make($input, $rules);
+
+        if($validator->passes()) {
+            $shop->title = $request->shop_title;
+            $shop->description = $request->shop_description;
+            $shop->email = $request->shop_email;
+            $shop->phone = $request->shop_code.$request->shop_phone;
+            $shop->country = $request->shop_country;
+
+
+            $shop->save();
+
+            $success= ['success' => 'Shop added successfully'];
+            $success_json = response()->json($success);
+            return $success_json;
+
+        }
+
+        $error = [
+            'error' => $validator->messages()->get("*")
+        ];
+
+        $error_json = response()->json($error);
+
+        return $error_json;
+
+    }
+
 }

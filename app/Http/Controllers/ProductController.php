@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Product;
 use PDF;
+use Validator;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -259,6 +260,70 @@ class ProductController extends Controller
         $pdf = PDF::loadView("pdf_template", $products);
 
         return $pdf->download("products.pdf");
+
+    }
+
+    public function indexstore(Request $request)
+    {
+        $categories = Category::all();
+        $categories_count = $categories->count();
+
+        $product = new Product;
+
+        $input = [
+            'product_title' => $request->product_title,
+            'product_excertpt' => $request->product_excertpt,
+            'product_description' => $request->product_description,
+            'product_price' => $request->product_price,
+            // 'product_logo' => $request->product_logo,
+            'product_category' => $request->product_category
+        ];
+
+        $rules = [
+            'product_title' => 'required|regex:/^[\pL\s]+$/u|unique:products,title|min:6|max:225',
+            'product_excertpt' => 'required|max:600',
+            'product_description' => 'required|max:1500',
+            'product_price' => 'required|numeric|gt:0',
+            'product_logo' => 'image|mimes:jpg,jpeg,png',
+            'product_category' => 'required|numeric|gt:0|lte:'.$categories_count,
+        ];
+
+        $validator = Validator::make($input, $rules);
+
+        if($validator->passes()) {
+            $product->title = $request->product_title;
+            $product->excertpt = $request->product_excertpt;
+            $product->description = $request->product_description;
+            $product->price = $request->product_price;
+            $product->category_id = $request->product_category;
+
+            // if($request->has('product_logo'))
+            // {
+            //     $imageName = time().'.'.$request->product_logo->extension();
+            //     $input['product_logo'] = '/images/'.$imageName;
+            //     $request->product_logo->move(public_path('images'), $imageName);
+
+            //  } else {
+
+                $product->image = '/images/noimage.png';
+            // }
+
+
+            $product->save();
+
+            $success= ['success' => 'Product added successfully'];
+            $success_json = response()->json($success);
+            return $success_json;
+
+        }
+
+        $error = [
+            'error' => $validator->messages()->get("*")
+        ];
+
+        $error_json = response()->json($error);
+
+        return $error_json;
 
     }
 
